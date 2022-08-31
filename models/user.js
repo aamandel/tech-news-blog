@@ -13,7 +13,7 @@ class User extends Model {
 // define table columns and configuration
 User.init(
     {
-        // define an id column
+        // id column
         id: {
             // use the special Sequelize DataTypes object provide what type of data it is
             type: DataTypes.INTEGER,
@@ -24,12 +24,12 @@ User.init(
             // turn on auto increment
             autoIncrement: true
         },
-        // define a username column
+        // username column
         username: {
             type: DataTypes.STRING,
             allowNull: false
         },
-        // define an email column
+        // email column
         email: {
             type: DataTypes.STRING,
             allowNull: false,
@@ -40,12 +40,12 @@ User.init(
                 isEmail: true
             }
         },
-        // define a password column
+        // password column
         password: {
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
-                // this means the password must be at least four characters long
+                // the password must be at least four characters long
                 len: [4]
             }
         }

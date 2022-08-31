@@ -1,78 +1,78 @@
 const router = require('express').Router();
-const { Post, User, Vote, Comment } = require("../../models");
+const { Review, User, Vote, Comment } = require("../../models");
 const sequelize = require('../../config/connection');
 
-// get all posts
+// get all reviews
 router.get('/', (req, res) => {
-    Post.findAll({
+    Review.findAll({
         attributes: [
             'id',
-            'post_url',
+            'review_url',
             'title',
             'created_at',
-            [sequelize.literal('(SELECT COUNT(*) FROM vote WHERE post.id = vote.post_id)'), 'vote_count']
+            [sequelize.literal('(SELECT COUNT(*) FROM vote WHERE review.id = vote.review_id)'), 'vote_count']
         ],
         order: [['created_at', 'DESC']],
         include: [
             // include the Comment model:
             {
                 model: Comment,
-                attributes: ['id', 'comment_text', 'post_id', 'user_id', 'created_at'],
+                attributes: ['id', 'comment_text', 'review_id', 'user_id', 'created_at'],
                 include: {
                     model: User,
                     attributes: ['username']
                 }
             },
-            // include the user who made the post:
+            // include the user who made the review:
             {
                 model: User,
                 attributes: ['username']
             }
         ]
     })
-        .then(dbPostData => res.json(dbPostData))
+        .then(dbReviewData => res.json(dbReviewData))
         .catch(err => {
             console.log(err);
             res.status(500).json(err);
         });
 });
 
-// get a specific post
+// get a specific review
 router.get('/:id', (req, res) => {
-    Post.findOne({
+    Review.findOne({
         where: {
             id: req.params.id
         },
         attributes: [
             'id',
-            'post_url',
+            'review_url',
             'title',
             'created_at',
-            [sequelize.literal('(SELECT COUNT(*) FROM vote WHERE post.id = vote.post_id)'), 'vote_count']
+            [sequelize.literal('(SELECT COUNT(*) FROM vote WHERE review.id = vote.review_id)'), 'vote_count']
         ],
         include: [
             // include the Comment model:
             {
                 model: Comment,
-                attributes: ['id', 'comment_text', 'post_id', 'user_id', 'created_at'],
+                attributes: ['id', 'comment_text', 'review_id', 'user_id', 'created_at'],
                 include: {
                     model: User,
                     attributes: ['username']
                 }
             },
-            // include the user who made the post:
+            // include the user who made the review:
             {
                 model: User,
                 attributes: ['username']
             }
         ]
     })
-        .then(dbPostData => {
-            if (!dbPostData) {
-                res.status(404).json({ message: 'No post found with this id' });
+        .then(dbReviewData => {
+            if (!dbReviewData) {
+                res.status(404).json({ message: 'No review found with this id' });
                 return;
             }
-            res.json(dbPostData);
+            res.json(dbReviewData);
         })
         .catch(err => {
             console.log(err);
@@ -80,35 +80,35 @@ router.get('/:id', (req, res) => {
         });
 });
 
-// create new post
+// create new review
 router.post('/', (req, res) => {
-    // expects {title: 'Taskmaster goes public!', post_url: 'https://taskmaster.com/press', user_id: 1}
-    Post.create({
+    // expects {title: 'Taskmaster goes public!', review_url: 'https://taskmaster.com/press', user_id: 1}
+    Review.create({
         title: req.body.title,
-        post_url: req.body.post_url,
+        review_url: req.body.review_url,
         user_id: req.body.user_id
     })
-        .then(dbPostData => res.json(dbPostData))
+        .then(dbReviewData => res.json(dbReviewData))
         .catch(err => {
             console.log(err);
             res.status(500).json(err);
         });
 });
 
-// PUT /api/posts/upvote
+// upvote a review: PUT /api/reviews/upvote
 router.put('/upvote', (req, res) => {
-    // custom static method created in models/Post.js
-    Post.upvote(req.body, { Vote })
-        .then(updatedPostData => res.json(updatedPostData))
+    // custom static method created in models/review.js
+    Review.upvote(req.body, { Vote })
+        .then(updatedReviewData => res.json(updatedReviewData))
         .catch(err => {
             console.log(err);
             res.status(400).json(err);
         });
 });
 
-// update post title
+// update review title
 router.put('/:id', (req, res) => {
-    Post.update(
+    Review.update(
         {
             title: req.body.title
         },
@@ -118,12 +118,12 @@ router.put('/:id', (req, res) => {
             }
         }
     )
-        .then(dbPostData => {
-            if (!dbPostData) {
-                res.status(404).json({ message: 'No post found with this id' });
+        .then(dbReviewData => {
+            if (!dbReviewData) {
+                res.status(404).json({ message: 'No review found with this id' });
                 return;
             }
-            res.json(dbPostData);
+            res.json(dbReviewData);
         })
         .catch(err => {
             console.log(err);
@@ -131,19 +131,19 @@ router.put('/:id', (req, res) => {
         });
 });
 
-// delete a post
+// delete a review
 router.delete('/:id', (req, res) => {
-    Post.destroy({
+    Review.destroy({
         where: {
             id: req.params.id
         }
     })
-        .then(dbPostData => {
-            if (!dbPostData) {
-                res.status(404).json({ message: 'No post found with this id' });
+        .then(dbReviewData => {
+            if (!dbReviewData) {
+                res.status(404).json({ message: 'No review found with this id' });
                 return;
             }
-            res.json(dbPostData);
+            res.json(dbReviewData);
         })
         .catch(err => {
             console.log(err);

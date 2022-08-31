@@ -1,24 +1,24 @@
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/connection');
 
-// create our Post model
-class Post extends Model {
+// create our Review model
+class Review extends Model {
     static upvote(body, models) {
         return models.Vote.create({
             user_id: body.user_id,
-            post_id: body.post_id
+            review_id: body.review_id
         }).then(() => {
-            return Post.findOne({
+            return Review.findOne({
                 where: {
-                    id: body.post_id
+                    id: body.review_id
                 },
                 attributes: [
                     'id',
-                    'post_url',
+                    'review_url',
                     'title',
                     'created_at',
                     [
-                        sequelize.literal('(SELECT COUNT(*) FROM vote WHERE post.id = vote.post_id)'),
+                        sequelize.literal('(SELECT COUNT(*) FROM vote WHERE review.id = vote.review_id)'),
                         'vote_count'
                     ]
                 ]
@@ -27,8 +27,8 @@ class Post extends Model {
     }
 }
 
-// create fields/columns for Post model
-Post.init(
+// create fields/columns for Review model
+Review.init(
     {
         id: {
             type: DataTypes.INTEGER,
@@ -40,11 +40,18 @@ Post.init(
             type: DataTypes.STRING,
             allowNull: false
         },
-        post_url: {
+        body: {
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
                 isURL: true
+            }
+        },
+        beach_id: {
+            type: DataTypes.INTEGER,
+            references: {
+                model: 'beach',
+                key: 'id'
             }
         },
         user_id: {
@@ -53,14 +60,18 @@ Post.init(
                 model: 'user',
                 key: 'id'
             }
+        },
+        image: {
+            type: DataTypes.STRING,
+            allowNull: true
         }
     },
     {
         sequelize,
         freezeTableName: true,
         underscored: true,
-        modelName: 'post'
+        modelName: 'review'
     }
 );
 
-module.exports = Post;
+module.exports = Review;

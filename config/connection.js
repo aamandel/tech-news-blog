@@ -4,7 +4,7 @@ const Sequelize = require('sequelize');
 // use env vars for db name, user, and pass
 require('dotenv').config();
 
-// create connection to tech news database
+// create connection to rms database
 let sequelize;
 if (process.env.JAWSDB_URL) {
     sequelize = new Sequelize(process.env.JAWSDB_URL);

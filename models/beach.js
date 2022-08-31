@@ -1,46 +1,44 @@
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/connection');
 
-class Comment extends Model { }
+class Beach extends Model { }
 
-Comment.init(
+Beach.init(
     {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true
         },
-        comment_text: {
+        name: {
             type: DataTypes.STRING,
-            allowNull: false,
-            validate: {
-                // comment must be at least one character long
-                len: [1]
-            }
+            allowNull: false
         },
-        user_id: {
+        longitude: {
+            type: DataTypes.FLOAT,
+            allowNull: false
+        },
+        latitude: {
+            type: DataTypes.FLOAT,
+            allowNull: false
+        },
+        county_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'user',
-                key: 'id'
-            }
-        },
-        review_id: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'review',
+                model: 'county',
                 key: 'id'
             }
         }
+
     },
     {
         sequelize,
+        timestamps: false,
         freezeTableName: true,
         underscored: true,
-        modelName: 'comment'
+        modelName: 'beach'
     }
 );
 
-module.exports = Comment;
+module.exports = Beach

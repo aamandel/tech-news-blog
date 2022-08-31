@@ -1,7 +1,7 @@
 const router = require('express').Router();
-const { User, Post, Vote, Comment } = require("../../models");
+const { User, Review, Vote, Comment } = require("../../models");
 
-// GET /api/users
+// Get all users: GET /api/users
 router.get('/', (req, res) => {
     // Access our User model and run .findAll() method)
     User.findAll({ attributes: { exclude: ['password'] } })
@@ -12,7 +12,7 @@ router.get('/', (req, res) => {
         });
 });
 
-// GET /api/users/1
+// Get user by ID: GET /api/users/1
 router.get('/:id', (req, res) => {
     User.findOne({
         attributes: { exclude: ['password'] },
@@ -21,24 +21,24 @@ router.get('/:id', (req, res) => {
         },
         include: [
             {
-                model: Post,
-                attributes: ['id', 'title', 'post_url', 'created_at']
+                model: Review,
+                attributes: ['id', 'title', 'beach_id', 'created_at']
             },
             // include the Comment model:
             {
                 model: Comment,
                 attributes: ['id', 'comment_text', 'created_at'],
                 include: {
-                    model: Post,
+                    model: Review,
                     attributes: ['title']
                 }
             },
-            // include the Post model:
+            // include the Review model:
             {
-                model: Post,
+                model: Review,
                 attributes: ['title'],
                 through: Vote,
-                as: 'voted_posts'
+                as: 'voted_reviews'
             }
         ]
     })
@@ -55,9 +55,9 @@ router.get('/:id', (req, res) => {
         });
 });
 
-// POST /api/users
+// Create user: POST /api/users
 router.post('/', (req, res) => {
-    // expects {username: 'Lernantino', email: 'lernantino@gmail.com', password: 'password1234'}
+    // expects {username: 'MyName', email: 'exampleemail@gmail.com', password: 'mypass1234'}
     User.create({
         username: req.body.username,
         email: req.body.email,
@@ -70,9 +70,9 @@ router.post('/', (req, res) => {
         });
 });
 
-// POST /api/users/login
+// Login: POST /api/users/login
 router.post('/login', (req, res) => {
-    // expects {email: 'lernantino@gmail.com', password: 'password1234'}
+    // expects {email: 'exampleemail@gmail.com', password: 'mypass1234'}
     User.findOne({
         where: {
             email: req.body.email
@@ -82,22 +82,20 @@ router.post('/login', (req, res) => {
             res.status(400).json({ message: 'No user with that email address!' });
             return;
         }
-
         const validPassword = dbUserData.checkPassword(req.body.password);
         if (!validPassword) {
             res.status(400).json({ message: 'Incorrect password!' });
             return;
         }
-
         res.json({ user: dbUserData, message: 'You are now logged in!' });
     });
 });
 
-// PUT /api/users/1
+// Update user: PUT /api/users/1
 router.put('/:id', (req, res) => {
-    // expects {username: 'Lernantino', email: 'lernantino@gmail.com', password: 'password1234'}
+    // expects {username: 'MyName', email: 'exampleemail@gmail.com', password: 'mypass1234'}
 
-    // if req.body has exact key/value pairs to match the model, you can just use `req.body` instead
+    // if req.body has exact key/value pairs to match the model, use `req.body` instead
     User.update(req.body, {
         individualHooks: true,
         where: {
@@ -117,7 +115,7 @@ router.put('/:id', (req, res) => {
         });
 });
 
-// DELETE /api/users/1
+// Remove user from db: DELETE /api/users/1
 router.delete('/:id', (req, res) => {
     User.destroy({
         where: {

@@ -18,11 +18,11 @@ Vote.init(
                 key: 'id'
             }
         },
-        post_id: {
+        review_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'post',
+                model: 'review',
                 key: 'id'
             }
         }
